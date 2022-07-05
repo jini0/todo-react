@@ -1,5 +1,5 @@
 import './App.css';
-import { useRef, useReducer } from 'react';
+import { useRef, useReducer, useCallback } from 'react';
 import TodoLists from './components/TodoLists';
 import CreateTodo from './components/CreateTodo';
 import './style.css';
@@ -72,6 +72,19 @@ function App() {
         // console.log(e.target.value);
         console.log(text);
     }
+    // 💛7.5  useCallback()사용 - 성능최적화   --> onCreate는 useCallback()에 연관배열로 어떤 값을 줘야할지 모름..!  --> 그래서 실행이 안됨...
+    // const onCreate = useCallback(()=>{
+    //     dispatch({
+    //         //dispatch가 action을 통해서 여기것들을 전달해줄거임!
+    //         type:"CREATE_TODO",
+    //         todo: {
+    //             id: nextId.current,
+    //             todotext: text,
+    //             isDone: false,
+    //         }
+    //     })
+    //     nextId.current += 1;
+    // },[])                                 //빈 배열을 넣으면 값이 안바뀜!!  --> 
     const onCreate = ()=>{
         dispatch({
             //dispatch가 action을 통해서 여기것들을 전달해줄거임!
@@ -85,18 +98,32 @@ function App() {
         nextId.current += 1;
     }
     const nextId = useRef(4);
-    const onDelete = (id)=>{
+    // 💛7.5  useCallback()사용 - 성능최적화       --> delete는 연관배열로 id를 줘서 삭제해주면 돼서! useCallback으로 줘도 실행이 잘됨!
+    const onDelete = useCallback((id)=>{
         dispatch({
             type:"DELETE_TODO",
             id: id
         })
-    }
-    const onToggle = (id)=>{
+    },[])
+    // const onDelete = (id)=>{
+    //     dispatch({
+    //         type:"DELETE_TODO",
+    //         id: id
+    //     })
+    // }
+    // 💛7.5  useCallback()사용 - 성능최적화
+    const onToggle = useCallback((id)=>{
         dispatch({
             type:"ISDONE_TODO",
             id: id
         })
-    }
+    },[])
+    // const onToggle = (id)=>{
+    //     dispatch({
+    //         type:"ISDONE_TODO",
+    //         id: id
+    //     })
+    // }
   return (
     <div className="App" id="wrap">
       <CreateTodo text={text} onChange={onChange} onCreate={onCreate} />
